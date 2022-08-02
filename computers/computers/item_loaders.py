@@ -4,10 +4,9 @@ from scrapy.loader.processors import TakeFirst
 
 
 def convert_str_to_float(value):
-    value = value.replace("zł", "")
     value = value.replace("\xa0", " ")
+    value = value.replace("zł", "").replace(" ", "").replace(",", ".")
     value = value.strip()
-    value = value.replace(" ", "")
     if value:
         return float(value)
 
