@@ -16,23 +16,23 @@ class ComputerSpider(scrapy.Spider):
     PART_TUPLE = (PROCESSOR, GRAPHICS, CHIPSET)
 
     def __get_processor(self, response):
-        for row in response.css("tr"):
-            if row.css("th ::text").get() == "Seria procesora":
-                return row.css("td ::text").get()
+        for row in response.xpath("//tr"):
+            if row.xpath(".//th/text()").get() == "Seria procesora":
+                return row.xpath(".//td/text()").get()
 
         return
 
     def __get_graphics(self, response):
-        for row in response.css("tr"):
-            if row.css("th ::text").get() == self.GRAPHICS:
-                return row.css("td a ::text").get(row.css("td ::text").get())
+        for row in response.xpath("//tr"):
+            if row.xpath(".//th/text()").get() == self.GRAPHICS:
+                return row.xpath(".//td/a/text()").get(row.xpath(".//td/text()").get())
 
         return
 
     def __get_chipset(self, response):
-        for row in response.css("tr"):
-            if row.css("th ::text").get() == "Chipset płyty głównej":
-                return row.css("td ::text").get()
+        for row in response.xpath("//tr"):
+            if row.xpath(".//th/text()").get() == "Chipset płyty głównej":
+                return row.xpath(".//td/text()").get()
 
         return
 
@@ -42,8 +42,8 @@ class ComputerSpider(scrapy.Spider):
                 './/div[contains(concat(" ",normalize-space(@class)," ")," pagination ")]//ul/li[last()-1]//a/text()'
             ).get()
         )
-        for element in response.css("div.pe2-head"):
-            url = element.css("a.blank-link::attr(href)").get()
+        for element in response.xpath('.//div[@class="pe2-head"]'):
+            url = element.xpath(".//a/@href").get()
             if url:
                 yield scrapy.Request(url=str(url), callback=self.parse_detail)
 
