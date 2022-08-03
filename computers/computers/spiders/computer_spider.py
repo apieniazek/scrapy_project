@@ -37,23 +37,16 @@ class ComputerSpider(scrapy.Spider):
         return
 
     def parse(self, response, **kwargs):
-        max_page_number = int(
-            response.xpath(
-                './/div[contains(concat(" ",normalize-space(@class)," ")," pagination ")]//ul/li[last()-1]//a/text()'
-            ).get()
-        )
         for element in response.xpath('.//div[@class="pe2-head"]'):
             url = element.xpath(".//a/@href").get()
             if url:
                 yield scrapy.Request(url=str(url), callback=self.parse_detail)
 
-        self.STARTING_PAGE_NUMBER += 1
-        if self.STARTING_PAGE_NUMBER > max_page_number:
-            self.STARTING_PAGE_NUMBER = 1
-            return
-
-        next_page = f"https://www.komputronik.pl/search-filter/5801/komputery-do-gier?p={self.STARTING_PAGE_NUMBER}"
-        yield scrapy.Request(url=next_page, callback=self.parse)
+        next_page = response.xpath(
+            '//i[@class="icon icon-caret2-right"]/parent::a/@href'
+        ).get()
+        if next_page:
+            yield scrapy.Request(url=next_page, callback=self.parse)
 
     def parse_detail(self, response, **kwargs):
         part_map = {
